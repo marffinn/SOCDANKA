@@ -23,7 +23,8 @@ jobs:
         pip install pyinstaller
 
     - name: Build with PyInstaller
-      run: pyinstaller --onefile --noconsole --name SOCDunk --icon="uttanka.ico" --add-data "uttanka.png;." --manifest manifest.xml main.py
+      shell: powershell
+      run: pyinstaller --onefile --noconsole --name SOCDunk --icon="uttanka.ico" --add-data "uttanka.png;." --manifest manifest.xml main.py --debug=all
 
     - name: Create Release
       id: create_release
