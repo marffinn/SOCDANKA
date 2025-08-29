@@ -22,9 +22,14 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
+    - name: List files in the repository
+      run: |
+        ls -R
+      shell: powershell
+
     - name: Build with PyInstaller
       shell: powershell
-      run: pyinstaller --onefile --noconsole --name SOCDunk --icon="uttanka.ico" --add-data "uttanka.png;." --manifest manifest.xml main.py --debug=all
+      run: pyinstaller --onefile main.py --debug=all
 
     - name: Create Release
       id: create_release
@@ -44,6 +49,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/SOCDunk.exe
+        asset_path: ./dist/main.exe
         asset_name: SOCDunk.exe
         asset_content_type: application/vnd.microsoft.portable-executable
