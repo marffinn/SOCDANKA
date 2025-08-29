@@ -4,6 +4,9 @@ on:
   push:
     branches: [ master ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: self-hosted
@@ -33,7 +36,7 @@ jobs:
 
     - name: Build with PyInstaller
       shell: powershell
-      run: pyinstaller --onefile main.py --debug=all
+      run: pyinstaller --onefile --noconsole --name SOCD_Cleaner --icon="uttanka.ico" --add-data "uttanka.png;." --manifest manifest.xml main.py
 
     - name: Create Release
       id: create_release
@@ -53,6 +56,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/main.exe
-        asset_name: SOCDunk.exe
+        asset_path: ./dist/SOCD_Cleaner.exe
+        asset_name: SOCD_Cleaner.exe
         asset_content_type: application/vnd.microsoft.portable-executable
