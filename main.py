@@ -9,7 +9,7 @@ import ctypes
 import sys
 import os
 import hashlib
-# // hasht
+# // hashta
 VALID_KEY_HASH = "94e23b1329f62da47588e48188cb10b8af5dbe0415273e5430d38d7d44361f2d"
 
 
