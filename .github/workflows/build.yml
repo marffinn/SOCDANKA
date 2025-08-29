@@ -17,10 +17,11 @@ jobs:
         python-version: '3.x'
 
     - name: Install dependencies
+      shell: powershell
       run: |
-        "${{ env.pythonLocation }}\python.exe" -m pip install --upgrade pip
-        "${{ env.pythonLocation }}\python.exe" -m pip install -r requirements.txt
-        "${{ env.pythonLocation }}\python.exe" -m pip install pyinstaller
+        & "${{ env.pythonLocation }}\python.exe" -m pip install --upgrade pip
+        & "${{ env.pythonLocation }}\python.exe" -m pip install -r requirements.txt
+        & "${{ env.pythonLocation }}\python.exe" -m pip install pyinstaller
 
     - name: List files in the repository
       run: |
