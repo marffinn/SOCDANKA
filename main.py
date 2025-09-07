@@ -36,6 +36,7 @@ def run_as_admin():
 
 is_simulating = False
 socd_enabled = True
+counter_strafe_enabled = False
 current_output = None
 min_delay = 0.030
 max_delay = 0.130
@@ -44,8 +45,17 @@ key_timestamps = {'a': 0.0, 'd': 0.0}
 controller = pynput.keyboard.Controller()
 
 
-def key_event_handler(event):
+def pulse_key(key, pulse_time=0.05):
     global is_simulating
+    is_simulating = True
+    controller.press(key)
+    time.sleep(pulse_time)
+    controller.release(key)
+    is_simulating = False
+
+
+def key_event_handler(event):
+    global is_simulating, counter_strafe_enabled
     if not socd_enabled or is_simulating: return True
     if event.name in ['a', 'd']:
         if event.event_type == 'down':
@@ -54,6 +64,10 @@ def key_event_handler(event):
         elif event.event_type == 'up':
             key_states[event.name] = False
             key_timestamps[event.name] = 0.0
+            if counter_strafe_enabled:
+                opposite_key = 'd' if event.name == 'a' else 'a'
+                if not key_states[opposite_key]:
+                    threading.Thread(target=pulse_key, args=(opposite_key,), daemon=True).start()
         return False
     return True
 
@@ -101,7 +115,7 @@ def launch_main_app():
 
     root = tk.Tk()
     root.title("A/D SOCD Cleaner");
-    root.geometry("420x250")
+    root.geometry("420x300")
     root.configure(bg=bg_color);
     root.resizable(False, False)
 
@@ -154,6 +168,14 @@ def launch_main_app():
                 current_output = None
                 key_states['a'], key_states['d'] = False, False
 
+    def toggle_counter_strafe(button):
+        global counter_strafe_enabled
+        counter_strafe_enabled = not counter_strafe_enabled
+        if counter_strafe_enabled:
+            button.config(text="COUNTER-STRAFE: ON", bg="#228B22")
+        else:
+            button.config(text="COUNTER-STRAFE: OFF", bg="#C70039")
+
     control_frame = Frame(main_frame, bg=bg_color)
     control_frame.pack(fill=tk.X, pady=(5, 10))
     control_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
@@ -183,6 +205,10 @@ def launch_main_app():
     toggle_button = Button(main_frame, text="SOCD: ON", **common_button_options, bg="#228B22",
                            activebackground="#5C9E5C", command=lambda: toggle_socd(toggle_button))
     toggle_button.pack(fill=tk.X, expand=True, pady=5, ipady=8)
+
+    counter_strafe_button = Button(main_frame, text="COUNTER-STRAFE: OFF", **common_button_options, bg="#C70039",
+                                   activebackground="#E57373", command=lambda: toggle_counter_strafe(counter_strafe_button))
+    counter_strafe_button.pack(fill=tk.X, expand=True, pady=5, ipady=8)
 
     update_button = Button(main_frame, text="UPDATE", **common_button_options, bg=accent_color,
                            activebackground="#5aaaff",
