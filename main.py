@@ -9,6 +9,8 @@ import ctypes
 import sys
 import os
 import hashlib
+import pystray
+from PIL import Image
 # // hashta
 VALID_KEY_HASH = "94e23b1329f62da47588e48188cb10b8af5dbe0415273e5430d38d7d44361f2d" 
 # passww
@@ -133,6 +135,20 @@ def launch_main_app():
     root.resizable(False, False)
     root.overrideredirect(True) # Remove the default title bar
 
+    # --- System Tray Icon ---
+    image = Image.open(resource_path("uttanka.png"))
+    def quit_window(icon, item):
+        icon.stop()
+        on_closing()
+
+    def show_window(icon, item):
+        icon.stop()
+        root.after(0, root.deiconify)
+
+    menu = (pystray.MenuItem('Quit', quit_window), pystray.MenuItem('Show', show_window))
+    icon = pystray.Icon("SOCDunk", image, "SOCDunk", menu)
+
+
     # --- Custom Title Bar ---
     title_bar = Frame(root, bg=title_bar_bg, relief='raised', bd=0, highlightthickness=0)
     title_bar.pack(fill=tk.X)
@@ -144,10 +160,14 @@ def launch_main_app():
         keyboard.unhook_all()
         controller.release('a')
         controller.release('d')
+        if icon.visible:
+            icon.stop()
         root.destroy()
 
     def minimize_window():
-        root.iconify()
+        root.withdraw()
+        threading.Thread(target=icon.run, daemon=True).start()
+
 
     close_button = Button(title_bar, text='X', bg=title_bar_bg, fg=text_color, relief='flat', command=on_closing)
     close_button.pack(side=tk.RIGHT, padx=2, pady=2)

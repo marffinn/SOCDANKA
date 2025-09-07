@@ -1,2 +1,4 @@
 pynput
 keyboard
+pystray
+Pillow
