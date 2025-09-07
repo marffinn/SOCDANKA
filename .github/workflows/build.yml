@@ -21,6 +21,10 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Debug PATH
+      run: echo $env:PATH
+      shell: powershell
+
     - name: Install dependencies
       shell: powershell
       run: |
