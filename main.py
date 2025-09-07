@@ -57,19 +57,31 @@ def pulse_key(key, pulse_time=0.05):
 
 def key_event_handler(event):
     global is_simulating, counter_strafe_enabled
-    if not socd_enabled or is_simulating: return True
+    if is_simulating: return True
+
     if event.name in ['a', 'd']:
+        # Update key states regardless of SOCD or counter-strafe status.
         if event.event_type == 'down':
-            if not key_states[event.name]: key_timestamps[event.name] = time.time()
+            if not key_states[event.name]:
+                key_timestamps[event.name] = time.time()
             key_states[event.name] = True
         elif event.event_type == 'up':
             key_states[event.name] = False
             key_timestamps[event.name] = 0.0
+
+            # Trigger counter-strafe if enabled.
             if counter_strafe_enabled:
                 opposite_key = 'd' if event.name == 'a' else 'a'
                 if not key_states[opposite_key]:
                     threading.Thread(target=pulse_key, args=(opposite_key,), daemon=True).start()
-        return False
+
+        # If SOCD is enabled, suppress the original key event.
+        # Otherwise, let it pass through.
+        if socd_enabled:
+            return False
+        else:
+            return True
+
     return True
 
 
@@ -107,23 +119,60 @@ def ad_socd_last_input(root):
 
 
 def launch_main_app():
-    bg_color = "#2E2E2E";
-    text_color = "#F5F5F5";
+    bg_color = "#2E2E2E"
+    text_color = "#F5F5F5"
     entry_bg = "#3C3F41"
-    accent_color = "#4A90E2";
-    border_color = "#1E1E1E";
+    accent_color = "#4A90E2"
+    border_color = "#1E1E1E"
     error_color = "#FF5733"
+    title_bar_bg = "#000000"
 
     root = tk.Tk()
-    root.title("A/D SOCD Cleaner");
     root.geometry("420x300")
-    root.configure(bg=bg_color);
+    root.configure(bg=bg_color)
     root.resizable(False, False)
+    root.overrideredirect(True) # Remove the default title bar
+
+    # --- Custom Title Bar ---
+    title_bar = Frame(root, bg=title_bar_bg, relief='raised', bd=0, highlightthickness=0)
+    title_bar.pack(fill=tk.X)
+
+    title_label = Label(title_bar, text="A/D SOCD Cleaner", bg=title_bar_bg, fg=text_color, font=("Segoe UI", 10, "bold"))
+    title_label.pack(side=tk.LEFT, padx=10)
+
+    def on_closing():
+        keyboard.unhook_all()
+        controller.release('a')
+        controller.release('d')
+        root.destroy()
+
+    def minimize_window():
+        root.iconify()
+
+    close_button = Button(title_bar, text='X', bg=title_bar_bg, fg=text_color, relief='flat', command=on_closing)
+    close_button.pack(side=tk.RIGHT, padx=2, pady=2)
+    minimize_button = Button(title_bar, text='_', bg=title_bar_bg, fg=text_color, relief='flat', command=minimize_window)
+    minimize_button.pack(side=tk.RIGHT)
+
+    # Drag functionality
+    def move_window(event):
+        root.geometry(f'+{event.x_root - root._offset_x}+{event.y_root - root._offset_y}')
+
+    def start_move(event):
+        root._offset_x = event.x
+        root._offset_y = event.y
+
+    title_bar.bind('<ButtonPress-1>', start_move)
+    title_bar.bind('<B1-Motion>', move_window)
+    title_label.bind('<ButtonPress-1>', start_move)
+    title_label.bind('<B1-Motion>', move_window)
+
+    # --- End Custom Title Bar ---
 
     try:
         icon_path = resource_path("uttanka.png")
         if os.path.exists(icon_path):
-            photo = tk.PhotoImage(file=icon_path);
+            photo = tk.PhotoImage(file=icon_path)
             root.iconphoto(False, photo)
     except tk.TclError:
         print("Warning: Could not load .png title bar icon.")
@@ -133,24 +182,25 @@ def launch_main_app():
     button_font = font.Font(family="Segoe UI", size=11, weight="bold")
 
     main_frame = Frame(root, bg=bg_color)
-    main_frame.pack(padx=15, pady=15, fill=tk.BOTH, expand=True)
+    # Adjust padding to account for the custom title bar
+    main_frame.pack(padx=15, pady=(0, 15), fill=tk.BOTH, expand=True)
 
     def update_delays_from_gui(min_entry, max_entry, button, error_label):
         global min_delay, max_delay
         try:
-            min_val_ms = int(min_entry.get());
+            min_val_ms = int(min_entry.get())
             max_val_ms = int(max_entry.get())
             if min_val_ms < 0 or max_val_ms < 0:
-                error_label.config(text="Delays cannot be negative.");
+                error_label.config(text="Delays cannot be negative.")
                 return
             if min_val_ms >= max_val_ms:
-                error_label.config(text="Min delay must be less than Max.");
+                error_label.config(text="Min delay must be less than Max.")
                 return
 
             error_label.config(text="")
-            min_delay = min_val_ms / 1000.0;
+            min_delay = min_val_ms / 1000.0
             max_delay = max_val_ms / 1000.0
-            button.config(text="UPDATED!");
+            button.config(text="UPDATED!")
             button.after(1000, lambda: button.config(text="UPDATE"))
         except ValueError:
             error_label.config(text="Please enter valid numbers.")
@@ -162,12 +212,12 @@ def launch_main_app():
             button.config(text="SOCD: ON", bg="#228B22")
         else:
             button.config(text="SOCD: OFF", bg="#C70039")
-            if current_output:
-                is_simulating = True;
-                controller.release(current_output)
-                is_simulating = False;
-                current_output = None
-                key_states['a'], key_states['d'] = False, False
+            is_simulating = True
+            controller.release('a')
+            controller.release('d')
+            is_simulating = False
+            current_output = None
+            key_states['a'], key_states['d'] = False, False
 
     def toggle_counter_strafe(button):
         global counter_strafe_enabled
@@ -187,14 +237,14 @@ def launch_main_app():
     Label(control_frame, text="MIN DELAY (MS)", font=label_font, bg=bg_color, fg=text_color).grid(row=0, column=0,
                                                                                                   sticky=tk.W, padx=5,
                                                                                                   pady=5)
-    min_entry = Entry(control_frame, **common_entry_options);
-    min_entry.grid(row=0, column=1, sticky=tk.W, padx=5, pady=5);
+    min_entry = Entry(control_frame, **common_entry_options)
+    min_entry.grid(row=0, column=1, sticky=tk.W, padx=5, pady=5)
     min_entry.insert(0, str(int(min_delay * 1000)))
     Label(control_frame, text="MAX DELAY (MS)", font=label_font, bg=bg_color, fg=text_color).grid(row=0, column=2,
                                                                                                   sticky=tk.W, padx=5,
                                                                                                   pady=5)
-    max_entry = Entry(control_frame, **common_entry_options);
-    max_entry.grid(row=0, column=3, sticky=tk.W, padx=5, pady=5);
+    max_entry = Entry(control_frame, **common_entry_options)
+    max_entry.grid(row=0, column=3, sticky=tk.W, padx=5, pady=5)
     max_entry.insert(0, str(int(max_delay * 1000)))
 
     error_label = Label(main_frame, text="", font=label_font, bg=bg_color, fg=error_color)
@@ -219,13 +269,6 @@ def launch_main_app():
     keyboard.hook(key_event_handler)
     threading.Thread(target=ad_socd_last_input, args=(root,), daemon=True).start()
 
-    def on_closing():
-        keyboard.unhook_all();
-        controller.release('a');
-        controller.release('d');
-        root.destroy()
-
-    root.protocol("WM_DELETE_WINDOW", on_closing)
     root.mainloop()
 
 
@@ -279,4 +322,5 @@ def create_activation_window():
 
 if __name__ == "__main__":
     run_as_admin()
-    create_activation_window()
+    #create_activation_window()
+    launch_main_app()
