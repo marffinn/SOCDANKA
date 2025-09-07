@@ -128,7 +128,7 @@ def launch_main_app():
     title_bar_bg = "#000000"
 
     root = tk.Tk()
-    root.geometry("420x300")
+    root.geometry("420x260") # Reduced height
     root.configure(bg=bg_color)
     root.resizable(False, False)
     root.overrideredirect(True) # Remove the default title bar
@@ -182,8 +182,7 @@ def launch_main_app():
     button_font = font.Font(family="Segoe UI", size=11, weight="bold")
 
     main_frame = Frame(root, bg=bg_color)
-    # Adjust padding to account for the custom title bar
-    main_frame.pack(padx=15, pady=(0, 15), fill=tk.BOTH, expand=True)
+    main_frame.pack(padx=10, pady=(0, 10), fill=tk.BOTH)
 
     def update_delays_from_gui(min_entry, max_entry, button, error_label):
         global min_delay, max_delay
@@ -228,43 +227,43 @@ def launch_main_app():
             button.config(text="COUNTER-STRAFE: OFF", bg="#C70039")
 
     control_frame = Frame(main_frame, bg=bg_color)
-    control_frame.pack(fill=tk.X, pady=(5, 10))
+    control_frame.pack(fill=tk.X, pady=5)
     control_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
 
     common_entry_options = {'font': entry_font, 'width': 8, 'bg': entry_bg, 'fg': text_color, 'relief': 'flat',
                             'highlightbackground': border_color, 'highlightthickness': 1,
                             'insertbackground': text_color}
     Label(control_frame, text="MIN DELAY (MS)", font=label_font, bg=bg_color, fg=text_color).grid(row=0, column=0,
-                                                                                                  sticky=tk.W, padx=5,
-                                                                                                  pady=5)
+                                                                                                  sticky=tk.W, padx=2,
+                                                                                                  pady=2)
     min_entry = Entry(control_frame, **common_entry_options)
-    min_entry.grid(row=0, column=1, sticky=tk.W, padx=5, pady=5)
+    min_entry.grid(row=0, column=1, sticky=tk.W, padx=2, pady=2)
     min_entry.insert(0, str(int(min_delay * 1000)))
     Label(control_frame, text="MAX DELAY (MS)", font=label_font, bg=bg_color, fg=text_color).grid(row=0, column=2,
-                                                                                                  sticky=tk.W, padx=5,
-                                                                                                  pady=5)
+                                                                                                  sticky=tk.W, padx=2,
+                                                                                                  pady=2)
     max_entry = Entry(control_frame, **common_entry_options)
-    max_entry.grid(row=0, column=3, sticky=tk.W, padx=5, pady=5)
+    max_entry.grid(row=0, column=3, sticky=tk.W, padx=2, pady=2)
     max_entry.insert(0, str(int(max_delay * 1000)))
 
     error_label = Label(main_frame, text="", font=label_font, bg=bg_color, fg=error_color)
-    error_label.pack(pady=(0, 10))
+    error_label.pack(pady=2)
 
     common_button_options = {'font': button_font, 'fg': text_color, 'relief': 'flat', 'activeforeground': text_color,
                              'bd': 0, 'cursor': "hand2"}
 
     toggle_button = Button(main_frame, text="SOCD: ON", **common_button_options, bg="#228B22",
                            activebackground="#5C9E5C", command=lambda: toggle_socd(toggle_button))
-    toggle_button.pack(fill=tk.X, expand=True, pady=5, ipady=8)
+    toggle_button.pack(fill=tk.X, pady=2, ipady=4)
 
     counter_strafe_button = Button(main_frame, text="COUNTER-STRAFE: OFF", **common_button_options, bg="#C70039",
                                    activebackground="#E57373", command=lambda: toggle_counter_strafe(counter_strafe_button))
-    counter_strafe_button.pack(fill=tk.X, expand=True, pady=5, ipady=8)
+    counter_strafe_button.pack(fill=tk.X, pady=2, ipady=4)
 
     update_button = Button(main_frame, text="UPDATE", **common_button_options, bg=accent_color,
                            activebackground="#5aaaff",
                            command=lambda: update_delays_from_gui(min_entry, max_entry, update_button, error_label))
-    update_button.pack(fill=tk.X, expand=True, pady=5, ipady=8)
+    update_button.pack(fill=tk.X, pady=2, ipady=4)
 
     keyboard.hook(key_event_handler)
     threading.Thread(target=ad_socd_last_input, args=(root,), daemon=True).start()
