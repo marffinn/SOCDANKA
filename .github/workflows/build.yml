@@ -83,9 +83,9 @@ jobs:
         
         $content = Get-Content index.html -Raw
         $content = $content -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag
-        $content = $content -replace 'href="#" id="downloadLink" class="download-button"' , "href=\"$downloadLink\" id=\"downloadLink\" class=\"download-button\""
-        $content = $content -replace 'Version: <span id="appVersion">Loading...</span>', "Version: <span id=\"appVersion\">$releaseTag</span>"
-        $content = $content -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', "Last Updated: <span id=\"lastUpdated\">$(Get-Date -Format \"yyyy-MM-dd\")</span>"
+        $content = $content -replace 'href="#"', "href=`"$downloadLink`""
+        $content = $content -replace 'Version: <span id="appVersion">Loading...</span>', "Version: <span id=`"appVersion`">$releaseTag</span>"
+        $content = $content -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', "Last Updated: <span id=`"lastUpdated`">$(Get-Date -Format `"yyyy-MM-dd`")</span>"
         $content | Set-Content index.html
 
     - name: Commit and push changes to gh-pages
