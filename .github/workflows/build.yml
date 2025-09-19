@@ -63,3 +63,30 @@ jobs:
         asset_path: ./dist/SOCDunk.exe
         asset_name: SOCDunk.exe
         asset_content_type: application/vnd.microsoft.portable-executable
+<<<<<<< Updated upstream
+=======
+
+  deploy-pages:
+    runs-on: self-hosted
+    needs: build
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+
+    - name: Update index.html with release info
+      run: |
+        $releaseTag = "${{ github.run_number }}"
+        $repoName = "${{ github.event.repository.name }}"
+        $ownerName = "${{ github.repository_owner }}"
+        $downloadLink = "https://github.com/$ownerName/$repoName/releases/download/$releaseTag/SOCDunk.exe"
+        
+        $content = Get-Content index.html -Raw
+        $content = $content -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag
+        $content = $content -replace 'href="#" id="downloadLink" class="download-button"' , "href=$downloadLink id="downloadLink" class="download-button""
+        $content = $content -replace 'Version: <span id="appVersion">Loading...</span>', "Version: <span id="appVersion">$releaseTag</span>"
+        $content = $content -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', "Last Updated: <span id="lastUpdated">$(Get-Date -Format "yyyy-MM-dd")</span>"
+        $content | Set-Content index.html
+>>>>>>> Stashed changes
