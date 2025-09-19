@@ -10,8 +10,6 @@ permissions:
 jobs:
   build:
     runs-on: self-hosted
-    permissions:
-      contents: write
 
     steps:
     - uses: actions/checkout@v3
@@ -34,8 +32,7 @@ jobs:
         & "${{ env.pythonLocation }}\python.exe" -m pip install pyinstaller --force-reinstall
 
     - name: List files in the repository
-      run: |
-        ls -R
+      run: ls -R
       shell: powershell
 
     - name: Build with PyInstaller
@@ -54,7 +51,6 @@ jobs:
         prerelease: false
 
     - name: Upload Release Asset
-      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,21 +78,19 @@ jobs:
         $ownerName = "${{ github.repository_owner }}"
         $downloadLink = "https://github.com/$ownerName/$repoName/releases/download/$releaseTag/SOCDunk.exe"
 
-        (Get-Content index.html -Raw) |
-        ForEach-Object {
-            $_ -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag `
-               -replace 'href="#"', ('href="{0}"' -f $downloadLink) `
-               -replace 'Version: <span id="appVersion">Loading...</span>', ('Version: <span id="appVersion">{0}</span>' -f $releaseTag) `
-               -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', ('Last Updated: <span id="lastUpdated">{0}</span>' -f (Get-Date -Format "yyyy-MM-dd"))
-        } | Set-Content index.html
+        $content = Get-Content index.html -Raw
+        $content = $content -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag
+        $content = $content -replace 'href="#"', "href=`"$downloadLink`""
+        $content = $content -replace 'Version: <span id="appVersion">Loading...</span>', "Version: <span id=`"appVersion`">$releaseTag</span>"
+        $content = $content -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', "Last Updated: <span id=`"lastUpdated`">$(Get-Date -Format `"yyyy-MM-dd`")</span>"
+        $content | Set-Content index.html
 
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add index.html
-        $changes = git status --porcelain
-        if ($changes) {
+        if (git diff --staged --quiet) {
+            echo "No changes to commit"
+        } else {
             git commit -m "Update index.html to release $releaseTag"
             git push
-        } else {
-            echo "No changes to commit"
         }
