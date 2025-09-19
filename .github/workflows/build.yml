@@ -70,6 +70,11 @@ jobs:
       with:
         ref: gh-pages
 
+    - name: Setup GH CLI
+      run: |
+        winget install --id GitHub.cli
+      shell: powershell
+
     - name: Update and commit index.html
       shell: powershell
       env:
