@@ -8,7 +8,7 @@ import threading
 import ctypes
 import sys
 import os
-# siemkad
+# siemkaddd
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
