@@ -70,9 +70,14 @@ jobs:
       with:
         ref: gh-pages
 
-    - name: Setup GH CLI
+    - name: Install Scoop
       run: |
-        winget install --id GitHub.cli
+        Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+        irm get.scoop.sh | iex
+      shell: powershell
+
+    - name: Install gh-cli
+      run: scoop install gh
       shell: powershell
 
     - name: Update and commit index.html
