@@ -1,0 +1,45 @@
+.beams-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+[class^="beam-item"] {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 500px;
+    background: linear-gradient(to top, transparent, #fff 50%, transparent);
+    opacity: 0;
+    animation: beam-animation 10s infinite linear;
+}
+
+@keyframes beam-animation {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg) scaleY(1);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg) scaleY(1.5);
+        opacity: 0;
+    }
+}
+
+.beam-item-1 { animation-delay: 0s; transform-origin: top; }
+.beam-item-2 { animation-delay: 1s; transform-origin: bottom; }
+.beam-item-3 { animation-delay: 2s; transform-origin: top; }
+.beam-item-4 { animation-delay: 3s; transform-origin: bottom; }
+.beam-item-5 { animation-delay: 4s; transform-origin: top; }
+.beam-item-6 { animation-delay: 5s; transform-origin: bottom; }
+.beam-item-7 { animation-delay: 6s; transform-origin: top; }
+.beam-item-8 { animation-delay: 7s; transform-origin: bottom; }
+.beam-item-9 { animation-delay: 8s; transform-origin: top; }
+.beam-item-10 { animation-delay: 9s; transform-origin: bottom; }

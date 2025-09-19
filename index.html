@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOCDunk App Download</title>
+    <link rel="stylesheet" href="background.css">
     <style>
         body {
             font-family: sans-serif;
@@ -13,18 +14,20 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: #000;
+            color: #fff;
         }
         .container {
-            background-color: #fff;
+            background-color: rgba(0, 0, 0, 0.5);
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
+            border: 1px solid #fff;
+            z-index: 1;
         }
         h1 {
-            color: #0056b3;
+            color: #61dafb;
         }
         .download-button {
             display: inline-block;
@@ -43,13 +46,13 @@
         .version-info {
             margin-top: 15px;
             font-size: 0.9em;
-            color: #666;
+            color: #ccc;
         }
         .older-releases {
             margin-top: 30px;
         }
         .older-releases h2 {
-            color: #0056b3;
+            color: #61dafb;
         }
         .release-list {
             list-style: none;
@@ -58,9 +61,24 @@
         .release-list li {
             margin-bottom: 10px;
         }
+        .release-list a {
+            color: #61dafb;
+        }
     </style>
 </head>
 <body>
+    <div class="beams-container">
+        <i class="beam-item-1"></i>
+        <i class="beam-item-2"></i>
+        <i class="beam-item-3"></i>
+        <i class="beam-item-4"></i>
+        <i class="beam-item-5"></i>
+        <i class="beam-item-6"></i>
+        <i class="beam-item-7"></i>
+        <i class="beam-item-8"></i>
+        <i class="beam-item-9"></i>
+        <i class="beam-item-10"></i>
+    </div>
     <div class="container">
         <h1>Download SOCDunk App</h1>
         <p>Get the latest version of the SOCDunk application.</p>

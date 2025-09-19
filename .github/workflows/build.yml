@@ -74,6 +74,7 @@ jobs:
       run: |
         Set-ExecutionPolicy RemoteSigned -scope CurrentUser
         irm get.scoop.sh | iex
+        Add-Content -Path $env:GITHUB_PATH -Value "$HOME\scoop\shims"
       shell: powershell
 
     - name: Install gh-cli
