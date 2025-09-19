@@ -74,29 +74,29 @@ jobs:
       with:
         ref: gh-pages
 
-    - name: Update index.html with release info
+    - name: Update and commit index.html
+      shell: powershell
       run: |
         $releaseTag = "${{ github.run_number }}"
         $repoName = "${{ github.event.repository.name }}"
         $ownerName = "${{ github.repository_owner }}"
         $downloadLink = "https://github.com/$ownerName/$repoName/releases/download/$releaseTag/SOCDunk.exe"
-        
-        $content = Get-Content index.html -Raw
-        $content = $content -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag
-        $content = $content -replace 'href="#"', "href=`"$downloadLink`""
-        $content = $content -replace 'Version: <span id="appVersion">Loading...</span>', "Version: <span id=`"appVersion`">$releaseTag</span>"
-        $content = $content -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', "Last Updated: <span id=`"lastUpdated`">$(Get-Date -Format `"yyyy-MM-dd`")</span>"
-        $content | Set-Content index.html
 
-    - name: Commit and push changes to gh-pages
-      run: |
+        (Get-Content index.html -Raw) |
+        ForEach-Object {
+            $_ -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag `
+               -replace 'href="#"', ('href="{0}"' -f $downloadLink) `
+               -replace 'Version: <span id="appVersion">Loading...</span>', ('Version: <span id="appVersion">{0}</span>' -f $releaseTag) `
+               -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', ('Last Updated: <span id="lastUpdated">{0}</span>' -f (Get-Date -Format "yyyy-MM-dd"))
+        } | Set-Content index.html
+
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add index.html
-        $hasChanges = git status --porcelain | Where-Object { $_ -match "index.html" }
-        if ($hasChanges) {
-            git commit -m "Update index.html with latest release info"
-            git push origin gh-pages
+        $changes = git status --porcelain
+        if ($changes) {
+            git commit -m "Update index.html to release $releaseTag"
+            git push
         } else {
-            echo "No changes to commit in index.html"
+            echo "No changes to commit"
         }
