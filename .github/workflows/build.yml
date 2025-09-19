@@ -72,14 +72,20 @@ jobs:
 
     - name: Update and commit index.html
       shell: powershell
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         $releaseTag = "${{ github.run_number }}"
         $repoName = "${{ github.event.repository.name }}"
         $ownerName = "${{ github.repository_owner }}"
         $downloadLink = "https://github.com/$ownerName/$repoName/releases/download/$releaseTag/SOCDunk.exe"
 
+        $releases = gh release list --repo $ownerName/$repoName --json tagName --limit 10
+        $releasesJson = $releases | ConvertTo-Json -Compress
+
         $content = Get-Content index.html -Raw
         $content = $content -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag
+        $content = $content -replace '{{ RELEASES_JSON }}', $releasesJson
         $content = $content -replace 'href="#"', "href=`"$downloadLink`""
         $content = $content -replace 'Version: <span id="appVersion">Loading...</span>', "Version: <span id=`"appVersion`">$releaseTag</span>"
         $content = $content -replace 'Last Updated: <span id="lastUpdated">Loading...</span>', "Last Updated: <span id=`"lastUpdated`">$(Get-Date -Format `"yyyy-MM-dd`")</span>"

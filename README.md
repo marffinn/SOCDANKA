@@ -10,40 +10,10 @@ A simple Windows application to clean Simultaneous Opposing Cardinal Direction (
 *   **License Activation:** The application requires a valid license key to run.
 *   **Runs as Administrator:** The application requests administrator privileges to ensure system-wide keyboard hooking.
 
-## Installation
+## Download
 
-To run the application from source, you will need Python installed.
-
-1.  Clone the repository:
-    ```bash
-    git clone <repository-url>
-    ```
-2.  Navigate to the project directory:
-    ```bash
-    cd SOCDBitchBetterRecognize
-    ```
-3.  Install the dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-4.  Run the application:
-    ```bash
-    python main.py
-    ```
-
-## Building
-
-To build the executable from the source, you will need to have PyInstaller installed.
-
-1.  Install PyInstaller:
-    ```bash
-    pip install pyinstaller
-    ```
-2.  Build the executable:
-    ```bash
-    pyinstaller SOCDunk.spec
-    ```
-    The executable will be located in the `dist` directory.
+You can download the latest version of the application from our website:
+[https://marffinn.github.io/SOCDBitchBetterRecognize/](https://marffinn.github.io/SOCDBitchBetterRecognize/)
 
 ## License
 

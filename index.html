@@ -45,6 +45,19 @@
             font-size: 0.9em;
             color: #666;
         }
+        .older-releases {
+            margin-top: 30px;
+        }
+        .older-releases h2 {
+            color: #0056b3;
+        }
+        .release-list {
+            list-style: none;
+            padding: 0;
+        }
+        .release-list li {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -54,30 +67,46 @@
         <a href="#" id="downloadLink" class="download-button">Download Latest Version</a>
         <p class="version-info">Version: <span id="appVersion">Loading...</span></p>
         <p class="version-info">Last Updated: <span id="lastUpdated">Loading...</span></p>
+
+        <div class="older-releases">
+            <h2>Older Releases</h2>
+            <ul id="releaseList" class="release-list">
+                <!-- Older releases will be dynamically inserted here -->
+            </ul>
+        </div>
     </div>
 
     <script>
-        // This script will be updated by the GitHub Actions workflow
-        // to dynamically set the download link and version information.
         document.addEventListener('DOMContentLoaded', () => {
             const downloadLink = document.getElementById('downloadLink');
             const appVersion = document.getElementById('appVersion');
             const lastUpdated = document.getElementById('lastUpdated');
+            const releaseList = document.getElementById('releaseList');
 
-            // Placeholder values - these will be replaced by the workflow
-            const latestReleaseTag = '{{ LATEST_RELEASE_TAG }}'; // e.g., '1'
-            const appFileName = 'SOCDunk.exe'; // Your app's executable name
+            const latestReleaseTag = '{{ LATEST_RELEASE_TAG }}';
+            const appFileName = 'SOCDunk.exe';
 
             if (latestReleaseTag && latestReleaseTag !== '{{ LATEST_RELEASE_TAG }}') {
                 downloadLink.href = `https://github.com/marff/SOCDBitchBetterRecognize/releases/download/${latestReleaseTag}/${appFileName}`;
                 appVersion.textContent = latestReleaseTag;
-                // You might need to fetch the actual release date from GitHub API for 'lastUpdated'
-                // or update this manually in the workflow. For now, we'll use a placeholder.
                 lastUpdated.textContent = new Date().toLocaleDateString();
             } else {
                 downloadLink.textContent = 'Download link not available yet.';
                 downloadLink.href = '#';
                 downloadLink.style.backgroundColor = '#6c757d';
+            }
+
+            const releases = '{{ RELEASES_JSON }}';
+            if (releases && releases !== '{{ RELEASES_JSON }}') {
+                const releaseData = JSON.parse(releases);
+                releaseData.forEach(release => {
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = `https://github.com/marff/SOCDBitchBetterRecognize/releases/download/${release.tag_name}/${appFileName}`;
+                    link.textContent = `Release ${release.tag_name}`;
+                    listItem.appendChild(link);
+                    releaseList.appendChild(listItem);
+                });
             }
         });
     </script>
