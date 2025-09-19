@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOCDunk App Download</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        .download-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+        }
+        .download-button:hover {
+            background-color: #0056b3;
+        }
+        .version-info {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Download SOCDunk App</h1>
+        <p>Get the latest version of the SOCDunk application.</p>
+        <a href="#" id="downloadLink" class="download-button">Download Latest Version</a>
+        <p class="version-info">Version: <span id="appVersion">Loading...</span></p>
+        <p class="version-info">Last Updated: <span id="lastUpdated">Loading...</span></p>
+    </div>
+
+    <script>
+        // This script will be updated by the GitHub Actions workflow
+        // to dynamically set the download link and version information.
+        document.addEventListener('DOMContentLoaded', () => {
+            const downloadLink = document.getElementById('downloadLink');
+            const appVersion = document.getElementById('appVersion');
+            const lastUpdated = document.getElementById('lastUpdated');
+
+            // Placeholder values - these will be replaced by the workflow
+            const latestReleaseTag = '{{ LATEST_RELEASE_TAG }}'; // e.g., '1'
+            const appFileName = 'SOCDunk.exe'; // Your app's executable name
+
+            if (latestReleaseTag && latestReleaseTag !== '{{ LATEST_RELEASE_TAG }}') {
+                downloadLink.href = `https://github.com/marff/SOCDBitchBetterRecognize/releases/download/${latestReleaseTag}/${appFileName}`;
+                appVersion.textContent = latestReleaseTag;
+                // You might need to fetch the actual release date from GitHub API for 'lastUpdated'
+                // or update this manually in the workflow. For now, we'll use a placeholder.
+                lastUpdated.textContent = new Date().toLocaleDateString();
+            } else {
+                downloadLink.textContent = 'Download link not available yet.';
+                downloadLink.href = '#';
+                downloadLink.style.backgroundColor = '#6c757d';
+            }
+        });
+    </script>
+</body>
+</html>
