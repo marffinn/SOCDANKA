@@ -51,9 +51,9 @@
     <div class="container">
         <h1>Download SOCDunk App</h1>
         <p>Get the latest version of the SOCDunk application.</p>
-        <a href="#" id="downloadLink" class="download-button">Download Latest Version</a>
-        <p class="version-info">Version: <span id="appVersion">Loading...</span></p>
-        <p class="version-info">Last Updated: <span id="lastUpdated">Loading...</span></p>
+        <a href="https://github.com/marffinn/SOCDBitchBetterRecognize/releases/download/39/SOCDunk.exe" id="downloadLink" class="download-button">Download Latest Version</a>
+        <p class="version-info">Version: <span id="appVersion">39</span></p>
+        <p class="version-info">Last Updated: <span id="lastUpdated">2025-09-19</span></p>
     </div>
 
     <script>
@@ -65,10 +65,10 @@
             const lastUpdated = document.getElementById('lastUpdated');
 
             // Placeholder values - these will be replaced by the workflow
-            const latestReleaseTag = '{{ LATEST_RELEASE_TAG }}'; // e.g., '1'
+            const latestReleaseTag = '39'; // e.g., '1'
             const appFileName = 'SOCDunk.exe'; // Your app's executable name
 
-            if (latestReleaseTag && latestReleaseTag !== '{{ LATEST_RELEASE_TAG }}') {
+            if (latestReleaseTag && latestReleaseTag !== '39') {
                 downloadLink.href = `https://github.com/marff/SOCDBitchBetterRecognize/releases/download/${latestReleaseTag}/${appFileName}`;
                 appVersion.textContent = latestReleaseTag;
                 // You might need to fetch the actual release date from GitHub API for 'lastUpdated'
@@ -83,3 +83,4 @@
     </script>
 </body>
 </html>
+
