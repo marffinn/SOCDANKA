@@ -63,3 +63,25 @@ jobs:
         asset_path: ./dist/SOCDunk.exe
         asset_name: SOCDunk.exe
         asset_content_type: application/vnd.microsoft.portable-executable
+
+  deploy-pages:
+    runs-on: self-hosted
+    needs: build
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+
+    - name: Update index.html with release info
+      run: |
+        $releaseTag = "${{ github.run_number }}"
+        $repoName = "${{ github.event.repository.name }}"
+        $ownerName = "${{ github.repository_owner }}"
+        $downloadLink = "https://github.com/$ownerName/$repoName/releases/download/$releaseTag/SOCDunk.exe"
+        
+        (Get-Content index.html) | ForEach-Object {
+            $_ -replace '{{ LATEST_RELEASE_TAG }}', $releaseTag `
+               -replace '#" id="downloadLink"', "$downloadLink" id="downloadLink" `
+               -replace 'Loading...\</span\>', "$releaseTag\</span\>
