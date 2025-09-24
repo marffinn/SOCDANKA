@@ -86,11 +86,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         $releaseTag = "${{ github.run_number }}"
-        $repoName = "${{ github.event.repository.name }}"
-        $ownerName = "${{ github.repository_owner }}"
+        $repoName = "SOCDANKA"
+        $ownerName = "marffinn"
         $downloadLink = "https://github.com/$ownerName/$repoName/releases/download/$releaseTag/SOCDunk.exe"
 
-        $releases = gh release list --repo $ownerName/$repoName --json tagName --limit 10
+        $releases = gh release list --repo marffinn/SOCDANKA --json tagName --limit 10
         $releasesJson = $releases | ConvertTo-Json -Compress
 
         $content = Get-Content index.html -Raw

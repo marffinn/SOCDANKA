@@ -105,7 +105,7 @@
             const appFileName = 'SOCDunk.exe';
 
             if (latestReleaseTag && latestReleaseTag !== '{{ LATEST_RELEASE_TAG }}') {
-                downloadLink.href = `https://github.com/marff/SOCDBitchBetterRecognize/releases/download/${latestReleaseTag}/${appFileName}`;
+                downloadLink.href = `https://github.com/marffinn/SOCDANKA/releases/download/${latestReleaseTag}/${appFileName}`;
                 appVersion.textContent = latestReleaseTag;
                 lastUpdated.textContent = new Date().toLocaleDateString();
             } else {
@@ -120,7 +120,7 @@
                 releaseData.forEach(release => {
                     const listItem = document.createElement('li');
                     const link = document.createElement('a');
-                    link.href = `https://github.com/marff/SOCDBitchBetterRecognize/releases/download/${release.tag_name}/${appFileName}`;
+                    link.href = `https://github.com/marffinn/SOCDANKA/releases/download/${release.tag_name}/${appFileName}`;
                     link.textContent = `Release ${release.tag_name}`;
                     listItem.appendChild(link);
                     releaseList.appendChild(listItem);

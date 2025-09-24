@@ -42,7 +42,7 @@ REM Set up GitHub repository URL with token
 set "GITHUB_USERNAME=marffinn"
 set "REPO_NAME=SOCDBitchBetterRecognize"
 
-set "REPO_URL=https://%GITHUB_USERNAME%:%GH_TOKEN%@github.com/marffinn/SOCDBitchBetterRecognize.git"
+set "REPO_URL=https://%GITHUB_USERNAME%:%GH_TOKEN%@github.com/marffinn/SOCDANKA.git"
 
 REM Check if tag exists and delete if necessary
 echo [INFO] Checking for existing tag %VERSION%...
@@ -77,5 +77,5 @@ if %errorlevel% neq 0 (
 
 echo [SUCCESS] Release %VERSION% created successfully!
 echo [INFO] GitHub Actions should trigger automatically to create the release
-echo [INFO] Check: https://github.com/%GITHUB_USERNAME%/%REPO_NAME%/releases
+echo [INFO] Check: https://github.com/marffinn/SOCDANKA/releases
 pause
