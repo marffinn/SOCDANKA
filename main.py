@@ -1,5 +1,5 @@
 import pynput.keyboard
-import keyboard
+import pynput.mouse
 import time
 import random
 import tkinter as tk
@@ -8,7 +8,7 @@ import threading
 import ctypes
 import sys
 import os
-# sie
+from queue import Queue
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
@@ -44,17 +44,58 @@ class SOCDApp(tk.Tk):
         self.key_timestamps = {self.key_left: 0.0, self.key_right: 0.0}
         self.controller = pynput.keyboard.Controller()
         
+        # Worker thread optimization
+        self.action_queue = Queue()
+        self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+        self.worker_thread.start()
+        self.running = True
+        
+        # Pre-calculated delays cache
+        self._delay_cache = []
+        self._update_delay_cache()
+        
         self.setup_ui()
         
-        keyboard.hook(self._key_event_handler)
+        self.listener = pynput.keyboard.Listener(on_press=self._on_press, on_release=self._on_release)
+        self.listener.start()
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
-    def _pulse_key(self, key, pulse_time=0.05):
-        self.is_simulating = True
-        self.controller.press(key)
-        time.sleep(pulse_time)
-        self.controller.release(key)
-        self.is_simulating = False
+    def _update_delay_cache(self):
+        self._delay_cache = [random.uniform(self.min_delay, self.max_delay) for _ in range(100)]
+        self._delay_index = 0
+    
+    def _get_cached_delay(self):
+        delay = self._delay_cache[self._delay_index]
+        self._delay_index = (self._delay_index + 1) % len(self._delay_cache)
+        return delay
+
+    def _worker(self):
+        while self.running:
+            try:
+                action, args = self.action_queue.get(timeout=0.1)
+                if action == 'press':
+                    self.is_simulating = True
+                    self.controller.press(args)
+                    self.is_simulating = False
+                elif action == 'release':
+                    self.is_simulating = True
+                    self.controller.release(args)
+                    self.is_simulating = False
+                elif action == 'pulse':
+                    key, pulse_time = args
+                    self.is_simulating = True
+                    self.controller.press(key)
+                    time.sleep(pulse_time)
+                    self.controller.release(key)
+                    self.is_simulating = False
+                elif action == 'delayed_press':
+                    key, delay = args
+                    time.sleep(delay)
+                    self.is_simulating = True
+                    self.controller.press(key)
+                    self.is_simulating = False
+            except:
+                continue
 
     def _update_socd_output(self):
         if not self.socd_enabled:
@@ -62,51 +103,59 @@ class SOCDApp(tk.Tk):
 
         left_pressed = self.key_states[self.key_left]
         right_pressed = self.key_states[self.key_right]
-        new_output = None
-
+        
         if left_pressed and right_pressed:
             new_output = self.key_right if self.key_timestamps[self.key_right] > self.key_timestamps[self.key_left] else self.key_left
         elif left_pressed:
             new_output = self.key_left
         elif right_pressed:
             new_output = self.key_right
+        else:
+            new_output = None
 
         if new_output != self.current_output:
             if self.current_output:
-                self.is_simulating = True
-                self.controller.release(self.current_output)
-                self.is_simulating = False
+                self.action_queue.put(('release', self.current_output))
             
             if new_output:
-                delay = random.uniform(self.min_delay, self.max_delay)
-                threading.Timer(delay, self._press_key, args=[new_output]).start()
+                delay = self._get_cached_delay()
+                self.action_queue.put(('delayed_press', (new_output, delay)))
             
             self.current_output = new_output
+
+    def _on_press(self, key):
+        if self.is_simulating:
+            return
+        
+        try:
+            key_char = key.char.lower() if hasattr(key, 'char') and key.char else None
+        except AttributeError:
+            return
             
-    def _press_key(self, key):
-        self.is_simulating = True
-        self.controller.press(key)
-        self.is_simulating = False
+        if key_char in (self.key_left, self.key_right) and not self.key_states[key_char]:
+            self.key_states[key_char] = True
+            self.key_timestamps[key_char] = time.time()
+            self._update_socd_output()
 
-    def _key_event_handler(self, event):
-        if self.is_simulating or event.name not in (self.key_left, self.key_right):
-            return True
-
-        if event.event_type == 'down':
-            if not self.key_states[event.name]:
-                self.key_states[event.name] = True
-                self.key_timestamps[event.name] = time.time()
-        elif event.event_type == 'up':
-            self.key_states[event.name] = False
-            self.key_timestamps[event.name] = 0.0
+    def _on_release(self, key):
+        if self.is_simulating:
+            return
+            
+        try:
+            key_char = key.char.lower() if hasattr(key, 'char') and key.char else None
+        except AttributeError:
+            return
+            
+        if key_char in (self.key_left, self.key_right):
+            self.key_states[key_char] = False
+            self.key_timestamps[key_char] = 0.0
             
             if self.counter_strafe_enabled:
-                opposite_key = self.key_right if event.name == self.key_left else self.key_left
+                opposite_key = self.key_right if key_char == self.key_left else self.key_left
                 if not self.key_states[opposite_key]:
-                    threading.Thread(target=self._pulse_key, args=(opposite_key,), daemon=True).start()
-        
-        self._update_socd_output()
-        return not self.socd_enabled
+                    self.action_queue.put(('pulse', (opposite_key, 0.05)))
+            
+            self._update_socd_output()
 
     def setup_ui(self):
         bg_color = "#2E2E2E"
@@ -248,6 +297,7 @@ class SOCDApp(tk.Tk):
             self.error_label.config(text="")
             self.min_delay = min_val_ms / 1000.0
             self.max_delay = max_val_ms / 1000.0
+            self._update_delay_cache()
             
             if self.key_left != new_left_key or self.key_right != new_right_key:
                 if self.current_output:
@@ -287,7 +337,9 @@ class SOCDApp(tk.Tk):
             self.counter_strafe_button.config(text="COUNTER-STRAFE: OFF", bg="#C70039")
 
     def _on_closing(self):
-        keyboard.unhook_all()
+        self.running = False
+        if hasattr(self, 'listener'):
+            self.listener.stop()
         if self.current_output:
             self.controller.release(self.current_output)
         self.destroy()

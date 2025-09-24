@@ -1,3 +1,0 @@
-CLEANERPROKEY2025
-
-python -m PyInstaller --onefile --noconsole --name SOCDunk --icon="uttanka.ico" --add-data "uttanka.png;." --manifest manifest.xml --hidden-import pystray --hidden-import PIL main.py

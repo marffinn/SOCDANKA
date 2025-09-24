@@ -26,10 +26,9 @@ jobs:
     - name: Install dependencies
       shell: powershell
       run: |
-        & "${{ env.pythonLocation }}\python.exe" -m pip cache purge
-        & "${{ env.pythonLocation }}\python.exe" -m pip install --upgrade pip --force-reinstall
-        & "${{ env.pythonLocation }}\python.exe" -m pip install -r requirements.txt --force-reinstall
-        & "${{ env.pythonLocation }}\python.exe" -m pip install pyinstaller --force-reinstall
+        & "${{ env.pythonLocation }}\python.exe" -m pip install --upgrade pip
+        & "${{ env.pythonLocation }}\python.exe" -m pip install -r requirements.txt
+        & "${{ env.pythonLocation }}\python.exe" -m pip install pyinstaller
 
     - name: List files in the repository
       run: ls -R
@@ -37,7 +36,7 @@ jobs:
 
     - name: Build with PyInstaller
       shell: powershell
-      run: pyinstaller --onefile --noconsole --name SOCDunk --icon="uttanka.ico" --add-data "uttanka.png;." --manifest manifest.xml --hidden-import pystray --hidden-import PIL main.py
+      run: pyinstaller SOCDunk.spec
 
     - name: Create Release
       id: create_release

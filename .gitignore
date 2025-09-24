@@ -1,2 +1,77 @@
+# Environment files
+.env
+.env.local
+.env.*.local
 
+# Build artifacts
+build/
+dist/
+*.spec
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Windows shortcuts
+*.lnk
 GH-ActionsRunner.lnk
+
+# Python virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Testing
+.pytest_cache/
+.tox/
+
+# Documentation
+docs/_build/
+
+# Key files (security)
+KEY.txt
+*.key
+*.pem
+*.p12
+*.pfx
